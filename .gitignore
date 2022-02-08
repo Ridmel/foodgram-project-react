@@ -1,5 +1,8 @@
 # Frontend
 frontend/build/
+temp/
+.env.dev
+/static/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
