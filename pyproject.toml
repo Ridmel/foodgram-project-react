@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "foodgram-project"
+version = "0.1.0"
+description = ""
+authors = ["Roman S. <80767090+Ridmel@users.noreply.github.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+Django = "^3"
+djangorestframework = "^3.13.1"
+django-filter = "^21.1"
+psycopg2 = "^2.9.3"
+python-dotenv = "^0.20.0"
+
+[tool.poetry.dev-dependencies]
+isort = "^5.10.1"
+black = "^22.3.0"
+flake8 = "^4.0.1"
+pep8-naming = "^0.12.1"
+flake8-broken-line = "^0.4.0"
+flake8-return = "^1.1.3"
+flake8-isort = "^4.1.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 79
+extend-exclude = '\/migrations\/'
+
