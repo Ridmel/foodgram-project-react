@@ -25,10 +25,11 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # 3rd party
     "rest_framework",
-    # project
-    "users.apps.UsersConfig",
-    "followers.apps.FollowersConfig",
-    "recipes.apps.RecipesConfig",
+    "django-colorfield",
+    # 1st party
+    "users",
+    "subscriptions",
+    "recipes",
 ]
 
 MIDDLEWARE = [
