@@ -49,7 +49,7 @@ class Recipe(models.Model):
         verbose_name_plural = "Рецепты"
         constraints = (
             models.CheckConstraint(
-                check=models.Q(number__gte=1), name="recipe_minvalue_1"
+                check=models.Q(cooking_time__gte=1), name="recipe_minvalue_1"
             ),
         )
 
@@ -80,7 +80,7 @@ class Ingredient(models.Model):
         verbose_name_plural = "Ингредиенты"
         constraints = (
             models.CheckConstraint(
-                check=models.Q(number__gte=1), name="ingredient_minvalue_1"
+                check=models.Q(amount__gte=1), name="ingredient_minvalue_1"
             ),
         )
 

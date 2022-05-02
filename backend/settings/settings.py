@@ -14,6 +14,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 
 ALLOWED_HOSTS = [
     "localhost",
+    "127.0.0.1",
 ]
 
 INSTALLED_APPS = [
@@ -25,7 +26,9 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # 3rd party
     "rest_framework",
-    "django-colorfield",
+    "rest_framework.authtoken",
+    "djoser",
+    "colorfield",
     # 1st party
     "users",
     "subscriptions",
@@ -42,7 +45,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "config.urls"
+ROOT_URLCONF = "settings.urls"
 
 TEMPLATES = [
     {
@@ -60,7 +63,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "config.wsgi.application"
+WSGI_APPLICATION = "settings.wsgi.application"
 
 if DEBUG:
     DATABASES = {
@@ -98,7 +101,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "ru-ru"
 
 TIME_ZONE = "UTC"
 
@@ -109,7 +112,23 @@ USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "users.User"
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.TokenAuthentication",
+    ),
+    "DEFAULT_PAGINATION_CLASS": "users.paginators.CustomNumberPagination",
+    "PAGE_SIZE": 20,
+}
+
+DJOSER = {
+    "LOGIN_FIELD": "email",
+}

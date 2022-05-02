@@ -21,9 +21,15 @@ class Subscription(models.Model):
     class Meta:
         verbose_name = "Подписка"
         verbose_name_plural = "Подписки"
-        constrains = models.UniqueConstraint(
-            fields=("subscribed", "subscriber"),
-            name="subscription_subscribed_subscriber",
+        constraints = (
+            models.UniqueConstraint(
+                fields=("subscribed", "subscriber"),
+                name="subscription_subscribed_subscriber"
+            ),
+            models.CheckConstraint(
+                check=~models.Q(subscribed__exact=models.F("subscriber")),
+                name="subscription_subscribed_not_equals_subscriber"
+            ),
         )
 
     def __str__(self):
