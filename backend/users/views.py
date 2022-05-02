@@ -4,6 +4,7 @@ from rest_framework import mixins, permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from .paginators import CustomNumberPagination
 from .serializers import UserSerializer
 
 User = get_user_model()
@@ -17,6 +18,7 @@ class UserViewSet(
 ):
     serializer_class = UserSerializer
     queryset = User.objects.all()
+    pagination_class = CustomNumberPagination
 
     def perform_create(self, serializer):
         password = serializer.validated_data.pop("password")
