@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "djoser",
+    "django_filters",
     "colorfield",
     # 1st party
     "users",
@@ -125,10 +126,14 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.TokenAuthentication",
     ),
-    "DEFAULT_PAGINATION_CLASS": "users.paginators.CustomNumberPagination",
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
     "PAGE_SIZE": 20,
 }
 
 DJOSER = {
     "LOGIN_FIELD": "email",
 }
+
+SILENCED_SYSTEM_CHECKS = ("rest_framework.W001",)
