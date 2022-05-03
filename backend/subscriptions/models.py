@@ -24,11 +24,11 @@ class Subscription(models.Model):
         constraints = (
             models.UniqueConstraint(
                 fields=("subscribed", "subscriber"),
-                name="subscription_subscribed_subscriber"
+                name="subscription_subscribed_subscriber",
             ),
             models.CheckConstraint(
                 check=~models.Q(subscribed__exact=models.F("subscriber")),
-                name="subscription_subscribed_not_equals_subscriber"
+                name="subscription_subscribed_not_equals_subscriber",
             ),
         )
 
