@@ -1,8 +1,9 @@
-from django.contrib.auth import get_user_model
-from django.contrib.auth.hashers import make_password
 from rest_framework import mixins, permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+
+from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import make_password
 
 from .paginators import CustomNumberPagination
 from .serializers import UserSerializer

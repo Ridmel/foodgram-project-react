@@ -2,8 +2,8 @@ from rest_framework import mixins, viewsets
 from rest_framework.filters import SearchFilter
 from rest_framework.permissions import AllowAny
 
-from .models import Product
-from .serializers import ProductSerializer
+from .models import Product, Tag
+from .serializers import ProductSerializer, TagSerializer
 
 
 class ProductViewSet(
@@ -18,3 +18,13 @@ class ProductViewSet(
     SearchFilter.search_param = "name"
     filter_backends = (SearchFilter,)
     search_fields = ("^name",)
+
+
+class TagViewSet(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet,
+):
+    serializer_class = TagSerializer
+    queryset = Tag.objects.all()
+    permission_classes = (AllowAny,)
