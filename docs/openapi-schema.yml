@@ -613,7 +613,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Ingredient'
+                  $ref: '#/components/schemas/IngredientInRecipe'
           description: ''
       tags:
         - Ингредиенты
@@ -633,7 +633,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Ingredient'
+                $ref: '#/components/schemas/IngredientInRecipe'
           description: ''
       tags:
         - Ингредиенты

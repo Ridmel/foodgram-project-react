@@ -34,10 +34,13 @@ INSTALLED_APPS = [
     "users",
     "subscriptions",
     "recipes",
+    # only dev party
+    "debug_toolbar",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -129,10 +132,13 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": (
         "rest_framework.permissions.IsAuthenticated",
     ),
-    "PAGE_SIZE": 20,
+    "PAGE_SIZE": 1,
 }
-# TODO фильтр возможно не используется
+
 DJOSER = {
     "LOGIN_FIELD": "email",
 }
+
 SILENCED_SYSTEM_CHECKS = ("rest_framework.W001",)
+
+INTERNAL_IPS = ["127.0.0.1"]

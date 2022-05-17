@@ -3,6 +3,7 @@ from colorfield.fields import ColorField
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils import timezone
 
 User = get_user_model()
 
@@ -43,6 +44,10 @@ class Recipe(models.Model):
         related_name="basket_recipes",
         verbose_name="В корзинах",
     )
+    pub_date = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Время публикации",
+    )
 
     class Meta:
         verbose_name = "Рецепт"
@@ -57,18 +62,18 @@ class Recipe(models.Model):
         return self.name
 
 
-class Ingredient(models.Model):
+class IngredientInRecipe(models.Model):
     recipe = models.ForeignKey(
         to=Recipe,
         on_delete=models.CASCADE,
         related_name="ingredients",
         verbose_name="Рецепт",
     )
-    product = models.ForeignKey(
-        to="Product",
+    ingredient = models.ForeignKey(
+        to="Ingredient",
         on_delete=models.PROTECT,
         related_name="ingredients",
-        verbose_name="Продукт",
+        verbose_name="Ингредиент",
     )
     amount = models.PositiveSmallIntegerField(
         verbose_name="Количество",
@@ -76,32 +81,36 @@ class Ingredient(models.Model):
     )
 
     class Meta:
-        verbose_name = "Ингредиент"
-        verbose_name_plural = "Ингредиенты"
+        verbose_name = "Ингредиент в рецепте"
+        verbose_name_plural = "Ингредиенты в рецептах"
         constraints = (
             models.CheckConstraint(
                 check=models.Q(amount__gte=1), name="ingredient_minvalue_1"
             ),
+            models.UniqueConstraint(
+                fields=("recipe", "ingredient"),
+                name="ingredientinrecipe_unique",
+            ),
         )
 
     def __str__(self):
-        return f"{self.product} ({self.amount})"
+        return f"{self.ingredient} ({self.amount})"
 
 
-class Product(models.Model):
+class Ingredient(models.Model):
     name = models.CharField(
         max_length=200,
         unique=True,
         verbose_name="Название",
     )
-    unit = models.CharField(
+    measurement_unit = models.CharField(
         max_length=200,
         verbose_name="Единицы измерения",
     )
 
     class Meta:
-        verbose_name = "Продукт"
-        verbose_name_plural = "Продукты"
+        verbose_name = "Ингредиент"
+        verbose_name_plural = "Ингредиенты"
 
     def __str__(self):
         return self.name
