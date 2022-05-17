@@ -28,11 +28,14 @@ class UserSerializer(serializers.ModelSerializer):
             "password": {"write_only": True},
         }
 
-    def get_is_subscribed(self, obj):
-        user = self.context.get("request").user
-        if not user.is_authenticated:
+    def get_is_subscribed(self, user):
+        current_user = self.context.get("request").user
+        if not current_user.is_authenticated:
             return False
-        return user != obj and user.subscribed.filter(id=obj.id).exists()
+        return (
+            current_user != user
+            and user.subscribed.filter(pk=user.pk).exists()
+        )
 
     def validate(self, data):
         user = User(**data)
