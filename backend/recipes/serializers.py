@@ -46,6 +46,12 @@ class IngrInRecipeUnsafeSerializer(serializers.ModelSerializer):
         return serializer.data
 
 
+class RecipeShortPresentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Recipe
+        fields = ("id", "name", "image", "cooking_time")
+
+
 class RecipeSafeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True)
     author = UserSerializer()

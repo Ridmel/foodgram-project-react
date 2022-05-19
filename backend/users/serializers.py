@@ -4,8 +4,6 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
-from recipes.models import Recipe
-
 User = get_user_model()
 
 
@@ -54,12 +52,6 @@ class UserSerializer(serializers.ModelSerializer):
         return super().validate(data)
 
 
-class RecipeForSubscriptionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Recipe
-        fields = ("id", "name", "image", "cooking_time")
-
-
 class UserForSubscriptionSerializer(UserSerializer):
     is_subscribed = serializers.BooleanField(default=True, read_only=True)
     recipes = serializers.SerializerMethodField()
@@ -72,9 +64,11 @@ class UserForSubscriptionSerializer(UserSerializer):
         )
 
     def get_recipes(self, user):
+        from recipes.serializers import RecipeShortPresentSerializer
+
         limit = self.context.get("view").get_recipes_limit()
         queryset = user.own_recipes.all()[:limit]
-        return RecipeForSubscriptionSerializer(
+        return RecipeShortPresentSerializer(
             queryset,
             many=True,
             context=self.context,
