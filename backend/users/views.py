@@ -31,10 +31,8 @@ class UserViewSet(
 
     def get_permissions(self):
         if self.action == "list" or self.action == "create":
-            self.permission_classes = (AllowAny,)
-        else:
-            self.permission_classes = (IsAuthenticated,)
-        return super().get_permissions()
+            return (AllowAny(),)
+        return (IsAuthenticated(),)
 
     def get_serializer_class(self):
         if self.action in ("subscriptions", "subscribe"):
@@ -103,7 +101,6 @@ class UserViewSet(
         Subscription.objects.create(subscribed=user, subscriber=current_user)
         user.is_subscribed = True
         serializer = self.get_serializer(instance=user)
-
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @subscribe.mapping.delete
