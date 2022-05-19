@@ -24,23 +24,18 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # 3rd party
+    # 3rd party apps
     "rest_framework",
     "rest_framework.authtoken",
     "djoser",
-    "django_filters",
     "colorfield",
-    # 1st party
+    # 1st party apps
     "users",
-    "subscriptions",
     "recipes",
-    # only dev party
-    "debug_toolbar",  # TODO
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "debug_toolbar.middleware.DebugToolbarMiddleware",  # TODO
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -48,6 +43,11 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+if DEBUG:
+    INSTALLED_APPS += ["debug_toolbar"]
+    MIDDLEWARE.insert(1, "debug_toolbar.middleware.DebugToolbarMiddleware")
+    INTERNAL_IPS = ["127.0.0.1"]
 
 ROOT_URLCONF = "settings.urls"
 
@@ -138,7 +138,5 @@ REST_FRAMEWORK = {
 DJOSER = {
     "LOGIN_FIELD": "email",
 }
-# TODO django-filter не использовался
-SILENCED_SYSTEM_CHECKS = ("rest_framework.W001",)
 
-INTERNAL_IPS = ["127.0.0.1"]  # TODO
+SILENCED_SYSTEM_CHECKS = ("rest_framework.W001",)

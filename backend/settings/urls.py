@@ -6,7 +6,6 @@ from django.contrib import admin
 from django.urls import include, path
 
 from recipes.urls import router as recipe_router
-from subscriptions.urls import router as subscription_router
 from users.urls import router as user_router
 
 router = DefaultRouter()
@@ -15,7 +14,6 @@ router.registry.extend(recipe_router.registry)
 
 api_urls = [
     path("auth/", include("djoser.urls.authtoken")),
-    path("users/", include(subscription_router.urls)),
     path(
         "users/set_password/",
         DjoserUserViewSet.as_view({"post": "set_password"}),
