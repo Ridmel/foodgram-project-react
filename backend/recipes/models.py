@@ -36,12 +36,12 @@ class Recipe(models.Model):
     in_favorites = models.ManyToManyField(
         to=User,
         related_name="favor_recipes",
-        verbose_name="В избранных",
+        verbose_name="В избранных у",
     )
     in_baskets = models.ManyToManyField(
         to=User,
         related_name="basket_recipes",
-        verbose_name="В корзинах",
+        verbose_name="В корзинах у",
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,
@@ -119,6 +119,10 @@ class Tag(models.Model):
     COLOR_PALETTE = [
         ("#FFFFFF", "white"),
         ("#000000", "black"),
+        ("#FFFF00", "yellow"),
+        ("#FF0000", "red"),
+        ("#0000FF", "blue"),
+        ("#00FF00", "green"),
     ]
 
     name = models.CharField(
