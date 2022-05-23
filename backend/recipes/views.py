@@ -95,7 +95,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         queryset = (
             Recipe.objects.select_related("author")
-            .prefetch_related("ingredients__ingredient", "tags")
+            .prefetch_related("ingredients_in_recipe__ingredient", "tags")
             .order_by("-pub_date")
         )
         if self.action == "list":
@@ -103,16 +103,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return queryset
 
     def apply_query_param_filters(self, queryset):
+        is_authenticated = self.request.user.is_authenticated
         author = self.request.query_params.get("author")
         if author and author.isdigit():
             queryset = queryset.filter(Q(author=int(author)))
 
         is_favorited = self.request.query_params.get("is_favorited")
-        if is_favorited and is_favorited == "1":
+        if is_authenticated and is_favorited and is_favorited == "1":
             queryset = queryset.filter(Q(in_favorites=self.request.user))
 
         is_in_cart = self.request.query_params.get("is_in_shopping_cart")
-        if is_in_cart and is_in_cart == "1":
+        if is_authenticated and is_in_cart and is_in_cart == "1":
             queryset = queryset.filter(Q(in_baskets=self.request.user))
 
         tags = self.request.query_params.getlist("tags")
@@ -121,8 +122,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             for tag in tags[1:]:
                 filter_tags = filter_tags | Q(tags__slug=tag)
             queryset = queryset.filter(filter_tags)
-
-        return queryset
+        return queryset.distinct()
 
     @action(detail=True, methods=("post",))
     def favorite(self, request, pk=None):
@@ -185,7 +185,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 ingredients_in_recipe__recipe__in_baskets=current_user
             )
             .values_list("name", "measurement_unit")
-            .annotate(amounttt=Sum("ingredients_in_recipe__amount"))
+            .annotate(amount=Sum("ingredients_in_recipe__amount"))
         )
         response = HttpResponse(content_type="text/csv")
         response[

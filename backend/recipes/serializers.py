@@ -55,7 +55,9 @@ class RecipeShortPresentSerializer(serializers.ModelSerializer):
 class RecipeSafeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True)
     author = UserSerializer()
-    ingredients = IngrInRecipeSafeSerializer(many=True)
+    ingredients = IngrInRecipeSafeSerializer(
+        many=True, source="ingredients_in_recipe"
+    )
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
 
@@ -126,7 +128,7 @@ class RecipeUnsafeSerializer(serializers.ModelSerializer):
 
         recipe = (
             Recipe.objects.select_related("author")
-            .prefetch_related("tags", "ingredients__ingredient")
+            .prefetch_related("tags", "ingredients_in_recipe__ingredient")
             .get(pk=recipe.id)
         )
         return recipe
@@ -150,7 +152,7 @@ class RecipeUnsafeSerializer(serializers.ModelSerializer):
 
         recipe = (
             Recipe.objects.select_related("author")
-            .prefetch_related("tags", "ingredients__ingredient")
+            .prefetch_related("tags", "ingredients_in_recipe__ingredient")
             .get(pk=recipe.id)
         )
         return recipe

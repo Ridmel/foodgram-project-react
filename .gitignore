@@ -1,5 +1,9 @@
+# Backend
+/backend/django_media/
+/backend/django_static/
+
 # Frontend
-frontend/build/
+/frontend/build/
 temp/
 .env.dev
 /static/
@@ -136,3 +140,4 @@ dmypy.json
 
 # .idea
 .idea
+/backend/django_media/

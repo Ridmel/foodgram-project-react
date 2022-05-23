@@ -13,6 +13,8 @@ if DEBUG:
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 ALLOWED_HOSTS = [
+    "host.docker.internal",
+    "backend",
     "localhost",
     "127.0.0.1",
 ]
@@ -45,9 +47,15 @@ MIDDLEWARE = [
 ]
 
 if DEBUG:
+    import socket
+
     INSTALLED_APPS += ["debug_toolbar"]
     MIDDLEWARE.insert(1, "debug_toolbar.middleware.DebugToolbarMiddleware")
-    INTERNAL_IPS = ["127.0.0.1"]
+    hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+    INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips] + [
+        "127.0.0.1",
+        "10.0.2.2",
+    ]
 
 ROOT_URLCONF = "settings.urls"
 
@@ -115,11 +123,11 @@ USE_L10N = True
 
 USE_TZ = True
 
-STATIC_URL = "/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_URL = "/django_static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "django_static")
 
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = "/django_media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "django_media")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -132,7 +140,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": (
         "rest_framework.permissions.IsAuthenticated",
     ),
-    "PAGE_SIZE": 2,
+    "PAGE_SIZE": 10,
 }
 
 DJOSER = {
@@ -140,3 +148,9 @@ DJOSER = {
 }
 
 SILENCED_SYSTEM_CHECKS = ("rest_framework.W001",)
+
+USE_X_FORWARDED_HOST = True
+
+DEBUG_TOOLBAR_CONFIG = {
+    "SHOW_TOOLBAR_CALLBACK": lambda request: DEBUG,
+}
