@@ -1,9 +1,11 @@
 from django.contrib import admin
 
+from .forms import RecipeFormset
 from .models import Ingredient, IngredientInRecipe, Recipe, Tag
 
 
 class IngredientInRecipeInline(admin.TabularInline):
+    formset = RecipeFormset
     model = IngredientInRecipe
 
 

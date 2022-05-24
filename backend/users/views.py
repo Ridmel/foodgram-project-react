@@ -6,12 +6,16 @@ from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from django.db.models import Count, Exists, OuterRef, Prefetch
-from django.shortcuts import get_object_or_404
 
 from recipes.models import Recipe
 from .models import Subscription
 from .paginators import CustomNumberPagination
-from .serializers import UserForSubscriptionSerializer, UserSerializer
+from .serializers import (
+    AddSubscriptionSerializer,
+    DelSubscriptionSerializer,
+    UserForSubscriptionSerializer,
+    UserSerializer,
+)
 
 User = get_user_model()
 
@@ -35,13 +39,17 @@ class UserViewSet(
         return (IsAuthenticated(),)
 
     def get_serializer_class(self):
-        if self.action in ("subscriptions", "subscribe"):
+        if self.action == "subscriptions":
             return UserForSubscriptionSerializer
+        if self.action == "subscribe":
+            return AddSubscriptionSerializer
+        if self.action == "subscribe_delete":
+            return DelSubscriptionSerializer
         return UserSerializer
 
     def get_queryset(self):
         current_user = self.request.user
-        recipes = Recipe.objects.order_by("-pub_date")
+        recipes = Recipe.objects.all()
         prefetch_recipes = Prefetch("own_recipes", queryset=recipes)
         if self.action == "subscriptions":
             return (
@@ -50,12 +58,6 @@ class UserViewSet(
                 .prefetch_related(prefetch_recipes)
                 .order_by("id")
             )
-
-        if self.action == "subscribe":
-            return User.objects.annotate(
-                recipes_count=Count("own_recipes")
-            ).prefetch_related(prefetch_recipes)
-
         if self.action == "list":
             if not current_user.is_authenticated:
                 return User.objects.all()
@@ -65,7 +67,6 @@ class UserViewSet(
                 )
             )
             return User.objects.annotate(is_subscribed=is_subscribed)
-
         return User.objects.all()
 
     def get_recipes_limit(self):
@@ -82,39 +83,20 @@ class UserViewSet(
 
     @action(detail=True, methods=("post",))
     def subscribe(self, request, pk=None):
-        current_user = request.user
-        queryset = self.get_queryset()
-        user = get_object_or_404(queryset, pk=pk)
-
-        if current_user == user:
-            raise validators.ValidationError(
-                {"errors": "Нельзя подписаться на самого себя."}
-            )
-
-        if Subscription.objects.filter(
-            subscribed=user, subscriber=request.user
-        ).exists():
-            raise validators.ValidationError(
-                {"errors": "Вы уже подписаны на этого пользователя."}
-            )
-
-        Subscription.objects.create(subscribed=user, subscriber=current_user)
-        user.is_subscribed = True
-        serializer = self.get_serializer(instance=user)
+        serializer = self.get_serializer(
+            data={"subscriber": request.user.id, "subscribed": pk}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @subscribe.mapping.delete
     def subscribe_delete(self, request, pk=None):
-        current_user = request.user
-        user = get_object_or_404(User, pk=pk)
-        subscription = Subscription.objects.filter(
-            subscribed=user, subscriber=current_user
-        ).first()
-        if not subscription:
-            raise validators.ValidationError(
-                {"errors": "Вы не подписаны на этого пользователя."}
-            )
-        subscription.delete()
+        serializer = self.get_serializer(
+            data={"subscriber": request.user.id, "subscribed": pk}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.instance.subscription.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False)

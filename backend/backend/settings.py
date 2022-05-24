@@ -57,7 +57,7 @@ if DEBUG:
         "10.0.2.2",
     ]
 
-ROOT_URLCONF = "settings.urls"
+ROOT_URLCONF = "backend.urls"
 
 TEMPLATES = [
     {
@@ -75,7 +75,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "settings.wsgi.application"
+WSGI_APPLICATION = "backend.wsgi.application"
 
 if DEBUG:
     DATABASES = {

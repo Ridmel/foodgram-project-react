@@ -23,7 +23,11 @@ class Recipe(models.Model):
     )
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name="Время приготовления",
-        validators=(MinValueValidator(1),),
+        validators=(
+            MinValueValidator(
+                1, "Время приготовления не может быть меньше одной минуты."
+            ),
+        ),
     )
     tags = models.ManyToManyField(
         to="Tag",
@@ -56,6 +60,7 @@ class Recipe(models.Model):
                 check=models.Q(cooking_time__gte=1), name="recipe_minvalue_1"
             ),
         )
+        ordering = ("-pub_date",)
 
     def __str__(self):
         return self.name
@@ -76,7 +81,9 @@ class IngredientInRecipe(models.Model):
     )
     amount = models.PositiveSmallIntegerField(
         verbose_name="Количество",
-        validators=(MinValueValidator(1),),
+        validators=(
+            MinValueValidator(1, "Количество не может быть меньше единицы"),
+        ),
     )
 
     class Meta:
