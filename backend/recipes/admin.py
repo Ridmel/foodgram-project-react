@@ -1,9 +1,11 @@
 from django.contrib import admin
 
+from .forms import RecipeFormset
 from .models import Ingredient, IngredientInRecipe, Recipe, Tag
 
 
 class IngredientInRecipeInline(admin.TabularInline):
+    formset = RecipeFormset
     model = IngredientInRecipe
 
 
@@ -21,11 +23,10 @@ class IngredientAdmin(admin.ModelAdmin):
 class RecipeAdmin(admin.ModelAdmin):
     list_display = ("name", "author", "pub_date")
     list_display_links = ("name",)
-    search_fields = ("name", "author")
+    search_fields = ("name",)
     list_filter = ("name", "author", "tags")
     ordering = ("-pub_date",)
     exclude = ("tags",)
-    filter_horizontal = ("in_favorites", "in_baskets")
     inlines = (IngredientInRecipeInline, TagInline)
     readonly_fields = ("get_count", "pub_date")
     fieldsets = (
@@ -38,8 +39,6 @@ class RecipeAdmin(admin.ModelAdmin):
                     "text",
                     "cooking_time",
                     "image",
-                    "in_favorites",
-                    "in_baskets",
                     "pub_date",
                     "get_count",
                 )

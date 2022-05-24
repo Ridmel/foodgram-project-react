@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from django.db import transaction
+from django.shortcuts import get_object_or_404
 
 from users.serializers import UserSerializer
 from .fields import Base64ImageField
@@ -55,9 +56,15 @@ class RecipeShortPresentSerializer(serializers.ModelSerializer):
 class RecipeSafeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True)
     author = UserSerializer()
-    ingredients = IngrInRecipeSafeSerializer(many=True)
-    is_favorited = serializers.SerializerMethodField()
-    is_in_shopping_cart = serializers.SerializerMethodField()
+    ingredients = IngrInRecipeSafeSerializer(
+        many=True, source="ingredients_in_recipe"
+    )
+    is_favorited = serializers.SerializerMethodField(
+        method_name="get_is_favorited"
+    )
+    is_in_shopping_cart = serializers.SerializerMethodField(
+        method_name="get_is_in_shopping_cart"
+    )
 
     class Meta:
         model = Recipe
@@ -126,7 +133,7 @@ class RecipeUnsafeSerializer(serializers.ModelSerializer):
 
         recipe = (
             Recipe.objects.select_related("author")
-            .prefetch_related("tags", "ingredients__ingredient")
+            .prefetch_related("tags", "ingredients_in_recipe__ingredient")
             .get(pk=recipe.id)
         )
         return recipe
@@ -140,7 +147,7 @@ class RecipeUnsafeSerializer(serializers.ModelSerializer):
             setattr(recipe, attr, value)
         recipe.save()
 
-        old_ingredients = recipe.ingredients.all()
+        old_ingredients = recipe.ingredients_in_recipe.all()
         old_ingredients.delete()
         ingredients_in_recipe = self.populate_ingredients(
             valid_ingredients, recipe
@@ -150,7 +157,7 @@ class RecipeUnsafeSerializer(serializers.ModelSerializer):
 
         recipe = (
             Recipe.objects.select_related("author")
-            .prefetch_related("tags", "ingredients__ingredient")
+            .prefetch_related("tags", "ingredients_in_recipe__ingredient")
             .get(pk=recipe.id)
         )
         return recipe
@@ -170,6 +177,78 @@ class RecipeUnsafeSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         return RecipeSafeSerializer(
+            instance=instance,
+            context=self.context,
+        ).data
+
+
+class RecipeFavoriteSerializer(serializers.Serializer):
+    recipe_id = serializers.IntegerField()
+
+    def validate(self, data):
+        action = self.context.get("view").action
+        current_user = self.context.get("view").request.user
+        recipe_id = data.get("recipe_id")
+        recipe = get_object_or_404(Recipe, pk=recipe_id)
+        is_in_favorite = recipe.in_favorites.filter(
+            pk=current_user.id
+        ).exists()
+
+        if action == "favorite" and is_in_favorite:
+            raise serializers.ValidationError(
+                {"errors": "Рецепт уже есть в избранном."}
+            )
+        if action == "favorite_delete" and not is_in_favorite:
+            raise serializers.ValidationError(
+                {"errors": "Этого рецепта нет в избранном."}
+            )
+        recipe.is_favorited = True
+        self.instance = recipe
+        return data
+
+    def save(self, **kwargs):
+        current_user = self.context.get("view").request.user
+        self.instance.in_favorites.add(current_user)
+        return self.instance
+
+    def to_representation(self, instance):
+        return RecipeShortPresentSerializer(
+            instance=instance,
+            context=self.context,
+        ).data
+
+
+class RecipeShoppingCartSerializer(serializers.Serializer):
+    recipe_id = serializers.IntegerField()
+
+    def validate(self, data):
+        action = self.context.get("view").action
+        current_user = self.context.get("view").request.user
+        recipe_id = data.get("recipe_id")
+        recipe = get_object_or_404(Recipe, pk=recipe_id)
+        is_in_shopping_cart = recipe.in_baskets.filter(
+            pk=current_user.id
+        ).exists()
+
+        if action == "shopping_cart" and is_in_shopping_cart:
+            raise serializers.ValidationError(
+                {"errors": "Рецепт уже есть в списке покупок."}
+            )
+        if action == "shopping_cart_delete" and not is_in_shopping_cart:
+            raise serializers.ValidationError(
+                {"errors": "Рецепта нет в списке покупок."}
+            )
+        recipe.is_in_shopping_cart = True
+        self.instance = recipe
+        return data
+
+    def save(self, **kwargs):
+        current_user = self.context.get("view").request.user
+        self.instance.in_baskets.add(current_user)
+        return self.instance
+
+    def to_representation(self, instance):
+        return RecipeShortPresentSerializer(
             instance=instance,
             context=self.context,
         ).data
