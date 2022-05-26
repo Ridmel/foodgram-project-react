@@ -1,11 +1,17 @@
+from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 
 from users.serializers import UserSerializer
-from .fields import Base64ImageField
 from .models import Ingredient, IngredientInRecipe, Recipe, Tag
+
+
+class IngredientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ingredient
+        fields = ("id", "name", "measurement_unit")
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -15,6 +21,11 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class IngrInRecipeSafeSerializer(serializers.ModelSerializer):
+    id = serializers.SlugRelatedField(
+        slug_field="id",
+        queryset=Ingredient.objects.all(),
+        source="ingredient",
+    )
     name = serializers.SlugRelatedField(
         slug_field="name",
         read_only=True,
@@ -31,22 +42,6 @@ class IngrInRecipeSafeSerializer(serializers.ModelSerializer):
         fields = ("id", "name", "measurement_unit", "amount")
 
 
-class IngrInRecipeUnsafeSerializer(serializers.ModelSerializer):
-    id = serializers.SlugRelatedField(
-        slug_field="id",
-        queryset=Ingredient.objects.all(),
-        source="ingredient",
-    )
-
-    class Meta:
-        model = IngredientInRecipe
-        fields = ("id", "amount")
-
-    def to_representation(self, instance):
-        serializer = IngrInRecipeSafeSerializer(instance=instance)
-        return serializer.data
-
-
 class RecipeShortPresentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
@@ -57,7 +52,8 @@ class RecipeSafeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True)
     author = UserSerializer()
     ingredients = IngrInRecipeSafeSerializer(
-        many=True, source="ingredients_in_recipe"
+        many=True,
+        source="ingredients_in_recipe",
     )
     is_favorited = serializers.SerializerMethodField(
         method_name="get_is_favorited"
@@ -96,7 +92,7 @@ class RecipeUnsafeSerializer(serializers.ModelSerializer):
         queryset=Tag.objects.all(),
     )
     author = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    ingredients = IngrInRecipeUnsafeSerializer(many=True)
+    ingredients = IngrInRecipeSafeSerializer(many=True)
     image = Base64ImageField()
 
     class Meta:
