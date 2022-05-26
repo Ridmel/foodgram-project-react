@@ -103,7 +103,8 @@ class AddSubscriptionSerializer(serializers.Serializer):
         subscriber_id = validated_data.get("subscriber")
         subscribed_id = validated_data.get("subscribed")
         Subscription.objects.create(
-            subscribed_id=subscribed_id, subscriber_id=subscriber_id
+            subscribed_id=subscribed_id,
+            subscriber_id=subscriber_id,
         )
         user = User.objects.annotate(recipes_count=Count("own_recipes")).get(
             pk=subscribed_id

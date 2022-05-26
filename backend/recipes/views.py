@@ -1,6 +1,6 @@
 import csv
 
-from rest_framework import status, validators, viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
 from rest_framework.permissions import (
@@ -11,16 +11,15 @@ from rest_framework.permissions import (
 from rest_framework.response import Response
 
 from django.contrib.auth import get_user_model
-from django.db.models import Exists, OuterRef, Q, Sum
+from django.db.models import Q, Sum
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
 
 from users.paginators import CustomNumberPagination
 from users.permissions import IsOwnerOrReadOnlyForObject
 from .mixins import ListRetrieveGenericViewSet
-from .models import Ingredient, IngredientInRecipe, Recipe, Tag
+from .models import Ingredient, Recipe, Tag
 from .serializers import (
-    IngrInRecipeSafeSerializer,
+    IngredientSerializer,
     RecipeFavoriteSerializer,
     RecipeSafeSerializer,
     RecipeShoppingCartSerializer,
@@ -31,9 +30,9 @@ from .serializers import (
 User = get_user_model()
 
 
-class IngredientInRecipeViewSet(ListRetrieveGenericViewSet):
-    serializer_class = IngrInRecipeSafeSerializer
-    queryset = IngredientInRecipe.objects.select_related("ingredient")
+class IngredientViewSet(ListRetrieveGenericViewSet):
+    serializer_class = IngredientSerializer
+    queryset = Ingredient.objects.all()
     permission_classes = (AllowAny,)
 
     SearchFilter.search_param = "name"

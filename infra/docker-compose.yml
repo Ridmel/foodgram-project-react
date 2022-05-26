@@ -1,13 +1,47 @@
 version: '3.3'
+networks:
+  foodgram:
+    driver: bridge
+
 services:
 
+  frontend:
+    image: ridmel/foodgram_frontend:latest
+    volumes:
+      - ../frontend/:/app/result_build/
+
+  db:
+    image: postgres:14-alpine
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data/
+    env_file:
+      - .env
+
+  backend:
+    image: ridmel/foodgram_backend:latest
+    restart: always
+    volumes:
+      - static_volume:/app/django_static/
+      - media_volume:/app/django_media/
+    depends_on:
+      - db
+    env_file:
+      - .env
+
   nginx:
-    image: nginx:1.19.3
+    image: nginx:1.20-alpine
     ports:
       - "80:80"
     volumes:
-      - ./nginx-local.conf:/etc/nginx/conf.d/default.conf
+      - static_volume:/var/html/django_static/
+      - media_volume:/var/html/django_media/
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ../frontend/build:/usr/share/nginx/html/
       - ../docs/:/usr/share/nginx/html/api/docs/
-      - ../backend/django_static/:/var/html/django_static/
-      - ../backend/django_media/:/var/html/django_media/
+    depends_on:
+      - backend
+
+volumes:
+  static_volume:
+  media_volume:
+  postgres_volume:
