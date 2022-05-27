@@ -1,7 +1,14 @@
 BACKEND_SERVICE = backend
+BACKEND_IMAGE = ridmel/foodgram_backend:latest
+FRONTEND_IMAGE = ridmel/foodgram_frontend:latest
+
+refresh_images:
+	docker pull --quiet $(BACKEND_IMAGE) \
+	&& docker pull --quiet $(FRONTEND_IMAGE) \
 
 run_new:
-	docker compose up -d \
+	make refresh_images \
+	&& docker compose up -d \
 	&& sleep 5 \
 	&& docker compose exec $(BACKEND_SERVICE) python manage.py migrate \
 	&& docker compose exec $(BACKEND_SERVICE) python manage.py collectstatic --no-input
