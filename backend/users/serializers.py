@@ -40,7 +40,7 @@ class UserSerializer(serializers.ModelSerializer):
             return user.is_subscribed
         return (
             current_user != user
-            and user.subscribers.filter(pk=current_user.pk).exists()
+            and user.subscribers.filter(subscriber=current_user).exists()
         )
 
     def validate(self, data):
@@ -134,5 +134,5 @@ class DelSubscriptionSerializer(serializers.Serializer):
             raise ValidationError(
                 {"errors": "Вы не подписаны на этого пользователя."}
             )
-        self.instance = subscription
+        self.subscription = subscription
         return data
