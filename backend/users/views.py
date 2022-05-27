@@ -96,7 +96,7 @@ class UserViewSet(
             data={"subscriber": request.user.id, "subscribed": pk}
         )
         serializer.is_valid(raise_exception=True)
-        serializer.instance.subscription.delete()
+        serializer.subscription.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False)
