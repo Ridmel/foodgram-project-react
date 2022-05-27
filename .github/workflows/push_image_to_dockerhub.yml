@@ -1,5 +1,5 @@
 # .github/workflows/**main.yml**
-name: Foodgram workflow
+name: Built and pushed to docker hub
 
 on:
   push:
