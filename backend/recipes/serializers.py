@@ -158,18 +158,16 @@ class RecipeUnsafeSerializer(serializers.ModelSerializer):
         )
         return recipe
 
-    def validate_ingredients(self, ingredients):
+    def validate(self, data):
         """Validate ingredients for uniqueness among themselves."""
-        all_ingredients = []
-        for ingredient in ingredients:
-            all_ingredients.append(ingredient["ingredient"].pk)
-        unique_ingredients = set(all_ingredients)
-        if len(all_ingredients) != len(unique_ingredients):
+        ingredients = data.get("ingredients")
+        unique_ingredients = {ing.get("ingredient") for ing in ingredients}
+        if len(ingredients) != len(unique_ingredients):
             raise serializers.ValidationError(
                 "В одном рецепте не может быть "
                 "несколько одинаковых ингредиентов."
             )
-        return ingredients
+        return data
 
     def to_representation(self, instance):
         return RecipeSafeSerializer(
