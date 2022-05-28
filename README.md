@@ -1,44 +1,47 @@
 
 
+
 [![Built and pushed to docker hub](https://github.com/Ridmel/foodgram-project-react/actions/workflows/push_image_to_dockerhub.yml/badge.svg?branch=master)](https://github.com/Ridmel/foodgram-project-react/actions/workflows/push_image_to_dockerhub.yml)
 
-## Foodgram
+# Foodgram
+### Description
 
-    Временно развернут на IP: 51.250.81.146
-
-Сайт-площадка, где каждый может создать и разместить свои самые вкусные рецепты. 
-
-Стек технологий: Django, Django REST framework, PostgreSQL, Nginx, Gunicorn, Docker, Github actions/workflow  
-<br/>
-<br/>
-  
-  
-#### Запуск демо-версии:
-
-*(для развертывания необходим *docker compose v2+*)*  
-Выполнить из директории `/infra/`:
-
-    (sudo) make run_demo
-
-Сайт будет доступен по локальному адресу `127.0.0.1`.
-База данных демо-версии предзаполнена, в ней зарегистрированы два пользователя - с админскими правами и без:
- - ***user***  
-		логин: `user@user.com`  
-		пароль: `user`  
-- ***admin***  
-		логин: `admin@admin.com`  
-   		пароль: `admin`
-
-<br/>
+A web application where everyone can create and share their most delicious recipes.
 
 <img src="https://user-images.githubusercontent.com/80767090/170669580-95943292-55b9-4067-bfba-d7416c561dbb.png" alt="Your image title" width="500"/>
 
+#### Technology stack
+
+* Programming language: Python
+* Backend: Django, Django REST framework
+* Frontend: React
+* Database: PostgreSQL
+* Web server: Nginx
+* WSGI server: gunicorn
+<br/>
+  
+## Deploy 
+#### Demo version with pre-populated DB
+
+*(require *docker compose v2+*)*  
+Execute from `/infra/`:
+
+    (sudo) make run_demo
+
+The application will be available at the local address `127.0.0.1`. Two users are registered in DB - with and without admin rights:
+ - ***user***  
+		login: `user@user.com`  
+		password: `user`  
+- ***admin***  
+		login: `admin@admin.com`  
+   		password: `admin`
+
 <br/>
 
-#### Запуск версии с чистой БД:  
-*(для развертывания необходим *docker compose*)*  
-Создать файл `.env` в каталоге `/infra/` с необходимыми переменными окружения (пример в файле `/infra/.env.example`).
-Выполнить из директории `/infra/`:
+#### Version with clean DB:  
+*(require *docker compose*)*  
+Create an `.env` file in `/infra/` with desired environment variables. An example file can be found in `/infra/.env.example`.  
+Execute from `/infra/`:
 
     (sudo) make run_new
     make create_user
@@ -46,4 +49,4 @@
 <br/>
 <br/>  
 
-*Автор: Роман Сергиенко* 
+*Author: Roman Sergienko* 
