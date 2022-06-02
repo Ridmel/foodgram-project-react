@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - master
+    paths-ignore:
+    - '**.md'
 
 jobs:
   build_and_push_to_docker_hub:
