@@ -17,7 +17,7 @@ A web application where everyone can create and share their most delicious recip
 * Frontend: React
 * Database: PostgreSQL
 * Web server: Nginx
-* WSGI server: gunicorn
+* WSGI server: Gunicorn
 <br/>
   
 ## Deploy 
